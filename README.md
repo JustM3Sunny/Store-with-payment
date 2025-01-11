@@ -53,8 +53,10 @@ Font Awesome: Used for social media icons (via CDN, no installation required).
 🤝 Contributing
 We welcome contributions! 🎉 Feel free to open a pull request, report issues, or suggest improvements. Together, we can make Vibee even better!
 
-✍️ Developer Signature
+✍️ Developer
+
 Developer: Sunny
+
 GitHub Profile: JustM3Sunny
 
 Enjoy shopping with Vibee! 🌈✨

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibee - Fashion Store</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+   
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <h1>Vibee</h1>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#cart">Cart</a></li>
+                    <li><a href="#payment">Payment</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="products">
+            <h2>Our Products</h2>
+            <div class="products">
+                <div class="product">
+                    <img src="../assets/item1.webp" alt="Product 1">
+                    <h3>Product 1</h3>
+                    <p>$19.99</p>
+                    <button onclick="addToCart('Product 1', 19.99)">Add to Cart</button>
+                </div>
+                <div class="product">
+                    <img src="../assets/item2.webp" alt="Product 2">
+                    <h3>Product 2</h3>
+                    <p>$29.99</p>
+                    <button onclick="addToCart('Product 2', 29.99)">Add to Cart</button>
+                </div>
+                <div class="product">
+                    <img src="../assets/item3.webp" alt="Product 3">
+                    <h3>Product 3</h3>
+                    <p>$39.99</p>
+                    <button onclick="addToCart('Product 3', 39.99)">Add to Cart</button>
+                </div>
+                <div class="product">
+                    <img src="../assets/item4.webp" alt="Product 4">
+                    <h3>Product 4</h3>
+                    <p>$49.99</p>
+                    <button onclick="addToCart('Product 4', 49.99)">Add to Cart</button>
+                </div>
+                 <div class="product">
+                    <img src="../assets/item5.webp" alt="Product 5">
+                    <h3>Product 5</h3>
+                    <p>$59.99</p>
+                    <button onclick="addToCart('Product 5', 59.99)">Add to Cart</button>
+                </div>
+                 <div class="product">
+                    <img src="../assets/item6.webp" alt="Product 6">
+                    <h3>Product 6</h3>
+                    <p>$69.99</p>
+                    <button onclick="addToCart('Product 6', 69.99)">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="cart" class="cart">
+            <h2>Shopping Cart</h2>
+            <div id="cart-items">
+                <!-- Cart items will be added here -->
+            </div>
+            <div class="cart-total">
+                <strong>Total: $<span id="cart-total">0.00</span></strong>
+            </div>
+             <button onclick="showAddressForm()" style="margin-top: 10px; background-color: #007bff; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Proceed to Checkout</button>
+        </section>
+
+         <section id="address" class="address-form" style="display:none;">
+            <h2>Shipping Address</h2>
+            <form id="address-form">
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" required>
+
+                <label for="address-line1">Address Line 1</label>
+                <input type="text" id="address-line1" required>
+
+                <label for="address-line2">Address Line 2</label>
+                <input type="text" id="address-line2">
+
+                <label for="city">City</label>
+                <input type="text" id="city" required>
+
+                 <label for="state">State</label>
+                <input type="text" id="state" required>
+
+                <label for="zip-code">Zip Code</label>
+                <input type="text" id="zip-code" required>
+
+                <button type="button" onclick="showPaymentForm()">Proceed to Payment</button>
+            </form>
+        </section>
+
+        <section id="payment" class="payment-form" style="display:none;">
+            <h2>Payment Details</h2>
+            <form id="payment-form">
+                
+                <label for="payment-method">Payment Method</label>
+                <select id="payment-method" onchange="togglePaymentFields()">
+                    <option value="credit">Credit Card</option>
+                    <option value="paypal">PayPal</option>
+                     <option value="upi">UPI</option>
+                    <option value="gpay">Google Pay</option>
+                </select>
+
+                <div id="card-fields" style="display:none;">
+                    <label for="card-name">Name on Card</label>
+                    <input type="text" id="card-name" >
+
+                    <label for="card-number">Card Number</label>
+                    <input type="text" id="card-number" >
+
+                    <label for="expiry-date">Expiry Date</label>
+                    <input type="text" id="expiry-date" placeholder="MM/YY" >
+
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" >
+                </div>
+
+                 <div id="upi-fields" style="display:none;">
+                    <label for="upi-id">UPI ID</label>
+                    <input type="text" id="upi-id" >
+                </div>
+
+                 <div id="gpay-fields" style="display:none;">
+                    <label for="gpay-id">Google Pay ID</label>
+                    <input type="text" id="gpay-id" >
+                </div>
+
+
+                <button type="submit">Complete Payment</button>
+            </form>
+        </section>
+
+        <section id="confirmation" class="confirmation" style="display:none;">
+            <h2>Order Confirmation</h2>
+            <p>Thank you for your order! Your payment was successful.</p>
+             <p>Your order will be delivered to:</p>
+            <div id="confirmation-details">
+                <!-- Confirmation details will be added here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Vibee. All rights reserved.</p>
+        <div class="social-icons">
+            <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+ <script src="script.js"></script>
+</body>
+</html>

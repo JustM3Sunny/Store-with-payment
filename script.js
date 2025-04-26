@@ -1,5 +1,5 @@
-let cart = [];
-let customerData = {};
+const cart = [];
+const customerData = {};
 
 function addToCart(name, price) {
     cart.push({ name, price });
@@ -18,9 +18,9 @@ function updateCart() {
     cartItemsDiv.innerHTML = '';
     let total = 0;
 
-    const fragment = document.createDocumentFragment(); // Use a fragment for better performance
+    const fragment = document.createDocumentFragment();
 
-    cart.forEach(item => {
+    for (const item of cart) { // Use a for...of loop for better readability
         const cartItemDiv = document.createElement('div');
         cartItemDiv.classList.add('cart-item');
         const nameSpan = document.createElement('span');
@@ -32,9 +32,9 @@ function updateCart() {
         cartItemDiv.appendChild(priceSpan);
         fragment.appendChild(cartItemDiv);
         total += item.price;
-    });
+    }
 
-    cartItemsDiv.appendChild(fragment); // Append the entire fragment at once
+    cartItemsDiv.appendChild(fragment);
     cartTotalSpan.textContent = total.toFixed(2);
 }
 
@@ -89,12 +89,17 @@ function togglePaymentFields() {
     upiFields.style.display = 'none';
     gpayFields.style.display = 'none';
 
-    if (paymentMethod === 'credit' || paymentMethod === 'paypal') {
-        cardFields.style.display = 'block';
-    } else if (paymentMethod === 'upi') {
-        upiFields.style.display = 'block';
-    } else if (paymentMethod === 'gpay') {
-        gpayFields.style.display = 'block';
+    switch (paymentMethod) { // Use a switch statement for better readability and maintainability
+        case 'credit':
+        case 'paypal':
+            cardFields.style.display = 'block';
+            break;
+        case 'upi':
+            upiFields.style.display = 'block';
+            break;
+        case 'gpay':
+            gpayFields.style.display = 'block';
+            break;
     }
 }
 
@@ -103,51 +108,60 @@ document.getElementById('payment-form').addEventListener('submit', function(even
     event.preventDefault();
 
     // Collect payment data
-    customerData.paymentMethod = document.getElementById('payment-method').value;
+    const paymentMethod = document.getElementById('payment-method').value;
+    customerData.paymentMethod = paymentMethod;
     customerData.cart = cart;
 
-    if (customerData.paymentMethod === 'credit' || customerData.paymentMethod === 'paypal') {
-        customerData.cardName = document.getElementById('card-name').value;
-        customerData.cardNumber = document.getElementById('card-number').value;
-        customerData.expiryDate = document.getElementById('expiry-date').value;
-        customerData.cvv = document.getElementById('cvv').value;
+    let isValid = true; // Flag to track overall form validity
+
+    if (paymentMethod === 'credit' || paymentMethod === 'paypal') {
+        const cardName = document.getElementById('card-name').value;
+        const cardNumber = document.getElementById('card-number').value;
+        const expiryDate = document.getElementById('expiry-date').value;
+        const cvv = document.getElementById('cvv').value;
+
+        customerData.cardName = cardName;
+        customerData.cardNumber = cardNumber;
+        customerData.expiryDate = expiryDate;
+        customerData.cvv = cvv;
+
         // Validate card details (basic validation)
-        if (!validateCardDetails()) {
+        isValid = validateCardDetails(cardNumber, expiryDate, cvv);
+        if (!isValid) {
             alert('Please check your card details.');
             return;
         }
-    } else if (customerData.paymentMethod === 'upi') {
-        customerData.upiId = document.getElementById('upi-id').value;
-        if (!customerData.upiId) {
+    } else if (paymentMethod === 'upi') {
+        const upiId = document.getElementById('upi-id').value;
+        customerData.upiId = upiId;
+        if (!upiId) {
             alert('Please enter your UPI ID.');
             return;
         }
-    }
-    else if (customerData.paymentMethod === 'gpay') {
-        customerData.gpayId = document.getElementById('gpay-id').value;
-        if (!customerData.gpayId) {
+    } else if (paymentMethod === 'gpay') {
+        const gpayId = document.getElementById('gpay-id').value;
+        customerData.gpayId = gpayId;
+        if (!gpayId) {
             alert('Please enter your Google Pay ID.');
             return;
         }
     }
 
 
-    // Send data to backend (simulated)
-    sendDataToBackend(customerData);
+    if (isValid) {
+        // Send data to backend (simulated)
+        sendDataToBackend(customerData);
 
-    // Show confirmation
-    showConfirmation();
+        // Show confirmation
+        showConfirmation();
 
-    // Reset cart
-    cart = [];
-    updateCart();
+        // Reset cart
+        cart.length = 0; // More efficient way to clear the array
+        updateCart();
+    }
 });
 
-function validateCardDetails() {
-    const cardNumber = document.getElementById('card-number').value;
-    const expiryDate = document.getElementById('expiry-date').value;
-    const cvv = document.getElementById('cvv').value;
-
+function validateCardDetails(cardNumber, expiryDate, cvv) {
     if (!cardNumber || cardNumber.length < 16 || isNaN(cardNumber)) return false;
     if (!expiryDate || expiryDate.length < 5) return false;
     if (!cvv || cvv.length < 3 || isNaN(cvv)) return false;
@@ -158,12 +172,14 @@ function validateCardDetails() {
 function sendDataToBackend(data) {
     // Simulate sending data to backend (replace with actual backend call)
     console.log('Sending data to backend:', data);
+    const cartTotal = document.getElementById('cart-total').textContent; // Get cart total here to avoid race conditions
+
     // Simulate UPI payment request
     if (data.paymentMethod === 'upi') {
-        alert(`Simulating UPI payment request to: ${data.upiId} for $${document.getElementById('cart-total').textContent}. Please complete the payment on your UPI app.`);
+        alert(`Simulating UPI payment request to: ${data.upiId} for $${cartTotal}. Please complete the payment on your UPI app.`);
     }
     if (data.paymentMethod === 'gpay') {
-        alert(`Simulating Google Pay payment request to: ${data.gpayId} for $${document.getElementById('cart-total').textContent}. Please complete the payment on your Google Pay app.`);
+        alert(`Simulating Google Pay payment request to: ${data.gpayId} for $${cartTotal}. Please complete the payment on your Google Pay app.`);
     }
     // Convert data to string for saving in a text file
     const dataString = JSON.stringify(data, null, 2);

@@ -20,7 +20,7 @@ function updateCart() {
 
     const fragment = document.createDocumentFragment();
 
-    for (const item of cart) { // Use a for...of loop for better readability
+    for (const item of cart) {
         const cartItemDiv = document.createElement('div');
         cartItemDiv.classList.add('cart-item');
         const nameSpan = document.createElement('span');
@@ -61,17 +61,25 @@ function showPaymentForm() {
     }
 
     // Collect address data
-    customerData.fullName = document.getElementById('full-name').value;
-    customerData.addressLine1 = document.getElementById('address-line1').value;
-    customerData.addressLine2 = document.getElementById('address-line2').value;
-    customerData.city = document.getElementById('city').value;
-    customerData.state = document.getElementById('state').value;
-    customerData.zipCode = document.getElementById('zip-code').value;
-
+    collectAddressData();
 
     addressForm.style.display = 'none';
     paymentForm.style.display = 'block';
     togglePaymentFields();
+}
+
+function collectAddressData() {
+    try {
+        customerData.fullName = document.getElementById('full-name').value;
+        customerData.addressLine1 = document.getElementById('address-line1').value;
+        customerData.addressLine2 = document.getElementById('address-line2').value;
+        customerData.city = document.getElementById('city').value;
+        customerData.state = document.getElementById('state').value;
+        customerData.zipCode = document.getElementById('zip-code').value;
+    } catch (error) {
+        console.error("Error collecting address data:", error);
+        alert("An error occurred while collecting address information. Please try again.");
+    }
 }
 
 function togglePaymentFields() {
@@ -89,7 +97,7 @@ function togglePaymentFields() {
     upiFields.style.display = 'none';
     gpayFields.style.display = 'none';
 
-    switch (paymentMethod) { // Use a switch statement for better readability and maintainability
+    switch (paymentMethod) {
         case 'credit':
         case 'paypal':
             cardFields.style.display = 'block';
@@ -99,6 +107,9 @@ function togglePaymentFields() {
             break;
         case 'gpay':
             gpayFields.style.display = 'block';
+            break;
+        default:
+            console.warn("Unknown payment method:", paymentMethod); // Handle unexpected payment methods
             break;
     }
 }
@@ -112,41 +123,24 @@ document.getElementById('payment-form').addEventListener('submit', function(even
     customerData.paymentMethod = paymentMethod;
     customerData.cart = cart;
 
-    let isValid = true; // Flag to track overall form validity
+    let isValid = true;
 
-    if (paymentMethod === 'credit' || paymentMethod === 'paypal') {
-        const cardName = document.getElementById('card-name').value;
-        const cardNumber = document.getElementById('card-number').value;
-        const expiryDate = document.getElementById('expiry-date').value;
-        const cvv = document.getElementById('cvv').value;
-
-        customerData.cardName = cardName;
-        customerData.cardNumber = cardNumber;
-        customerData.expiryDate = expiryDate;
-        customerData.cvv = cvv;
-
-        // Validate card details (basic validation)
-        isValid = validateCardDetails(cardNumber, expiryDate, cvv);
-        if (!isValid) {
-            alert('Please check your card details.');
-            return;
-        }
-    } else if (paymentMethod === 'upi') {
-        const upiId = document.getElementById('upi-id').value;
-        customerData.upiId = upiId;
-        if (!upiId) {
-            alert('Please enter your UPI ID.');
-            return;
-        }
-    } else if (paymentMethod === 'gpay') {
-        const gpayId = document.getElementById('gpay-id').value;
-        customerData.gpayId = gpayId;
-        if (!gpayId) {
-            alert('Please enter your Google Pay ID.');
-            return;
-        }
+    switch (paymentMethod) {
+        case 'credit':
+        case 'paypal':
+            isValid = collectAndValidateCardDetails();
+            break;
+        case 'upi':
+            isValid = collectAndValidateUpiDetails();
+            break;
+        case 'gpay':
+            isValid = collectAndValidateGpayDetails();
+            break;
+        default:
+            console.error("Invalid payment method selected.");
+            isValid = false;
+            break;
     }
-
 
     if (isValid) {
         // Send data to backend (simulated)
@@ -156,15 +150,68 @@ document.getElementById('payment-form').addEventListener('submit', function(even
         showConfirmation();
 
         // Reset cart
-        cart.length = 0; // More efficient way to clear the array
+        cart.length = 0;
         updateCart();
     }
 });
 
+function collectAndValidateCardDetails() {
+    const cardName = document.getElementById('card-name').value;
+    const cardNumber = document.getElementById('card-number').value;
+    const expiryDate = document.getElementById('expiry-date').value;
+    const cvv = document.getElementById('cvv').value;
+
+    customerData.cardName = cardName;
+    customerData.cardNumber = cardNumber;
+    customerData.expiryDate = expiryDate;
+    customerData.cvv = cvv;
+
+    const isValid = validateCardDetails(cardNumber, expiryDate, cvv);
+    if (!isValid) {
+        alert('Please check your card details.');
+    }
+    return isValid;
+}
+
+function collectAndValidateUpiDetails() {
+    const upiId = document.getElementById('upi-id').value;
+    customerData.upiId = upiId;
+    if (!upiId) {
+        alert('Please enter your UPI ID.');
+        return false;
+    }
+    return true;
+}
+
+function collectAndValidateGpayDetails() {
+    const gpayId = document.getElementById('gpay-id').value;
+    customerData.gpayId = gpayId;
+    if (!gpayId) {
+        alert('Please enter your Google Pay ID.');
+        return false;
+    }
+    return true;
+}
+
 function validateCardDetails(cardNumber, expiryDate, cvv) {
-    if (!cardNumber || cardNumber.length < 16 || isNaN(cardNumber)) return false;
-    if (!expiryDate || expiryDate.length < 5) return false;
-    if (!cvv || cvv.length < 3 || isNaN(cvv)) return false;
+    const cardNumberRegex = /^\d{16}$/; // Basic 16-digit card number validation
+    const expiryDateRegex = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
+    const cvvRegex = /^\d{3,4}$/; // 3 or 4 digit CVV
+
+    if (!cardNumber || !cardNumberRegex.test(cardNumber)) {
+        alert('Invalid card number. Please enter a 16-digit number.');
+        return false;
+    }
+
+    if (!expiryDate || !expiryDateRegex.test(expiryDate)) {
+        alert('Invalid expiry date. Please use MM/YY format.');
+        return false;
+    }
+
+    if (!cvv || !cvvRegex.test(cvv)) {
+        alert('Invalid CVV. Please enter a 3 or 4 digit number.');
+        return false;
+    }
 
     return true;
 }
@@ -172,7 +219,7 @@ function validateCardDetails(cardNumber, expiryDate, cvv) {
 function sendDataToBackend(data) {
     // Simulate sending data to backend (replace with actual backend call)
     console.log('Sending data to backend:', data);
-    const cartTotal = document.getElementById('cart-total').textContent; // Get cart total here to avoid race conditions
+    const cartTotal = document.getElementById('cart-total').textContent;
 
     // Simulate UPI payment request
     if (data.paymentMethod === 'upi') {
@@ -181,19 +228,27 @@ function sendDataToBackend(data) {
     if (data.paymentMethod === 'gpay') {
         alert(`Simulating Google Pay payment request to: ${data.gpayId} for $${cartTotal}. Please complete the payment on your Google Pay app.`);
     }
-    // Convert data to string for saving in a text file
-    const dataString = JSON.stringify(data, null, 2);
-    // Create a Blob from the string
-    const blob = new Blob([dataString], { type: 'text/plain' });
-    // Create a download link
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'customer_data.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+
+    // Save data to a file (consider security implications in a real application)
+    saveDataToFile(data);
+}
+
+function saveDataToFile(data) {
+    try {
+        const dataString = JSON.stringify(data, null, 2);
+        const blob = new Blob([dataString], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'customer_data.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Error saving data to file:", error);
+        alert("An error occurred while saving the data. Please try again.");
+    }
 }
 
 function showConfirmation() {

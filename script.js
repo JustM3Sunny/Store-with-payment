@@ -20,11 +20,13 @@ function updateCart() {
 
     const fragment = document.createDocumentFragment();
 
-    for (const item of cart) {
+    cart.forEach(item => {
         const cartItemDiv = document.createElement('div');
         cartItemDiv.classList.add('cart-item');
+
         const nameSpan = document.createElement('span');
         nameSpan.textContent = item.name;
+
         const priceSpan = document.createElement('span');
         priceSpan.textContent = `$${item.price.toFixed(2)}`;
 
@@ -32,7 +34,7 @@ function updateCart() {
         cartItemDiv.appendChild(priceSpan);
         fragment.appendChild(cartItemDiv);
         total += item.price;
-    }
+    });
 
     cartItemsDiv.appendChild(fragment);
     cartTotalSpan.textContent = total.toFixed(2);
@@ -60,8 +62,9 @@ function showPaymentForm() {
         return;
     }
 
-    // Collect address data
-    collectAddressData();
+    if (!collectAddressData()) {
+        return; // Prevent proceeding if address data collection fails
+    }
 
     addressForm.style.display = 'none';
     paymentForm.style.display = 'block';
@@ -76,9 +79,18 @@ function collectAddressData() {
         customerData.city = document.getElementById('city').value;
         customerData.state = document.getElementById('state').value;
         customerData.zipCode = document.getElementById('zip-code').value;
+
+        // Validate address data (example)
+        if (!customerData.fullName || !customerData.addressLine1 || !customerData.city || !customerData.state || !customerData.zipCode) {
+            alert("Please fill in all required address fields.");
+            return false; // Indicate validation failure
+        }
+
+        return true; // Indicate success
     } catch (error) {
         console.error("Error collecting address data:", error);
         alert("An error occurred while collecting address information. Please try again.");
+        return false; // Indicate failure
     }
 }
 
@@ -150,8 +162,7 @@ document.getElementById('payment-form').addEventListener('submit', function(even
         showConfirmation();
 
         // Reset cart
-        cart.length = 0;
-        updateCart();
+        resetCart();
     }
 });
 
@@ -180,6 +191,12 @@ function collectAndValidateUpiDetails() {
         alert('Please enter your UPI ID.');
         return false;
     }
+
+    const isValid = validateUpiDetails(upiId);
+    if (!isValid) {
+        alert('Please enter a valid UPI ID.');
+        return false;
+    }
     return true;
 }
 
@@ -188,6 +205,12 @@ function collectAndValidateGpayDetails() {
     customerData.gpayId = gpayId;
     if (!gpayId) {
         alert('Please enter your Google Pay ID.');
+        return false;
+    }
+
+    const isValid = validateGpayDetails(gpayId);
+    if (!isValid) {
+        alert('Please enter a valid Google Pay ID.');
         return false;
     }
     return true;
@@ -213,6 +236,22 @@ function validateCardDetails(cardNumber, expiryDate, cvv) {
         return false;
     }
 
+    return true;
+}
+
+function validateUpiDetails(upiId) {
+    const upiIdRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
+    if (!upiId || !upiIdRegex.test(upiId)) {
+        return false;
+    }
+    return true;
+}
+
+function validateGpayDetails(gpayId) {
+    const gpayIdRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!gpayId || !gpayIdRegex.test(gpayId)) {
+        return false;
+    }
     return true;
 }
 
@@ -270,4 +309,9 @@ function showConfirmation() {
         <p><strong>Payment Method:</strong> ${customerData.paymentMethod}</p>
         <p><strong>Total:</strong> $${document.getElementById('cart-total').textContent}</p>
     `;
+}
+
+function resetCart() {
+    cart.length = 0;
+    updateCart();
 }

@@ -73,18 +73,26 @@ function showPaymentForm() {
 
 function collectAddressData() {
     try {
-        customerData.fullName = document.getElementById('full-name').value;
-        customerData.addressLine1 = document.getElementById('address-line1').value;
-        customerData.addressLine2 = document.getElementById('address-line2').value;
-        customerData.city = document.getElementById('city').value;
-        customerData.state = document.getElementById('state').value;
-        customerData.zipCode = document.getElementById('zip-code').value;
+        const fullName = document.getElementById('full-name').value;
+        const addressLine1 = document.getElementById('address-line1').value;
+        const addressLine2 = document.getElementById('address-line2').value;
+        const city = document.getElementById('city').value;
+        const state = document.getElementById('state').value;
+        const zipCode = document.getElementById('zip-code').value;
 
-        // Validate address data (example)
-        if (!customerData.fullName || !customerData.addressLine1 || !customerData.city || !customerData.state || !customerData.zipCode) {
+        // Validate address data
+        if (!fullName || !addressLine1 || !city || !state || !zipCode) {
             alert("Please fill in all required address fields.");
             return false; // Indicate validation failure
         }
+
+        // Store address data in customerData object
+        customerData.fullName = fullName;
+        customerData.addressLine1 = addressLine1;
+        customerData.addressLine2 = addressLine2;
+        customerData.city = city;
+        customerData.state = state;
+        customerData.zipCode = zipCode;
 
         return true; // Indicate success
     } catch (error) {
@@ -172,48 +180,44 @@ function collectAndValidateCardDetails() {
     const expiryDate = document.getElementById('expiry-date').value;
     const cvv = document.getElementById('cvv').value;
 
+    const isValid = validateCardDetails(cardNumber, expiryDate, cvv);
+    if (!isValid) {
+        alert('Please check your card details.');
+        return false;
+    }
+
     customerData.cardName = cardName;
     customerData.cardNumber = cardNumber;
     customerData.expiryDate = expiryDate;
     customerData.cvv = cvv;
 
-    const isValid = validateCardDetails(cardNumber, expiryDate, cvv);
-    if (!isValid) {
-        alert('Please check your card details.');
-    }
     return isValid;
 }
 
 function collectAndValidateUpiDetails() {
     const upiId = document.getElementById('upi-id').value;
-    customerData.upiId = upiId;
-    if (!upiId) {
-        alert('Please enter your UPI ID.');
-        return false;
-    }
 
     const isValid = validateUpiDetails(upiId);
     if (!isValid) {
         alert('Please enter a valid UPI ID.');
         return false;
     }
-    return true;
+
+    customerData.upiId = upiId;
+    return isValid;
 }
 
 function collectAndValidateGpayDetails() {
     const gpayId = document.getElementById('gpay-id').value;
-    customerData.gpayId = gpayId;
-    if (!gpayId) {
-        alert('Please enter your Google Pay ID.');
-        return false;
-    }
 
     const isValid = validateGpayDetails(gpayId);
     if (!isValid) {
         alert('Please enter a valid Google Pay ID.');
         return false;
     }
-    return true;
+
+    customerData.gpayId = gpayId;
+    return isValid;
 }
 
 function validateCardDetails(cardNumber, expiryDate, cvv) {
@@ -241,18 +245,12 @@ function validateCardDetails(cardNumber, expiryDate, cvv) {
 
 function validateUpiDetails(upiId) {
     const upiIdRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
-    if (!upiId || !upiIdRegex.test(upiId)) {
-        return false;
-    }
-    return true;
+    return !!(upiId && upiIdRegex.test(upiId));
 }
 
 function validateGpayDetails(gpayId) {
     const gpayIdRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    if (!gpayId || !gpayIdRegex.test(gpayId)) {
-        return false;
-    }
-    return true;
+    return !!(gpayId && gpayIdRegex.test(gpayId));
 }
 
 function sendDataToBackend(data) {

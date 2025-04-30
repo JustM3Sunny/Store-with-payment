@@ -79,27 +79,21 @@ function collectAddressData() {
     const state = document.getElementById('state').value.trim();
     const zipCode = document.getElementById('zip-code').value.trim();
 
-    try {
-        // Validate address data
-        if (!fullName || !addressLine1 || !city || !state || !zipCode) {
-            alert("Please fill in all required address fields.");
-            return false; // Indicate validation failure
-        }
-
-        // Store address data in customerData object
-        customerData.fullName = fullName;
-        customerData.addressLine1 = addressLine1;
-        customerData.addressLine2 = addressLine2;
-        customerData.city = city;
-        customerData.state = state;
-        customerData.zipCode = zipCode;
-
-        return true; // Indicate success
-    } catch (error) {
-        console.error("Error collecting address data:", error);
-        alert("An error occurred while collecting address information. Please try again.");
-        return false; // Indicate failure
+    // Validate address data
+    if (!fullName || !addressLine1 || !city || !state || !zipCode) {
+        alert("Please fill in all required address fields.");
+        return false; // Indicate validation failure
     }
+
+    // Store address data in customerData object
+    customerData.fullName = fullName;
+    customerData.addressLine1 = addressLine1;
+    customerData.addressLine2 = addressLine2;
+    customerData.city = city;
+    customerData.state = state;
+    customerData.zipCode = zipCode;
+
+    return true; // Indicate success
 }
 
 function togglePaymentFields() {
@@ -180,6 +174,11 @@ function collectAndValidateCardDetails() {
     const expiryDate = document.getElementById('expiry-date').value.trim();
     const cvv = document.getElementById('cvv').value.trim();
 
+    if (!cardName || !cardNumber || !expiryDate || !cvv) {
+        alert('Please fill in all card details.');
+        return false;
+    }
+
     const isValid = validateCardDetails(cardNumber, expiryDate, cvv);
     if (!isValid) {
         return false;
@@ -196,6 +195,11 @@ function collectAndValidateCardDetails() {
 function collectAndValidateUpiDetails() {
     const upiId = document.getElementById('upi-id').value.trim();
 
+    if (!upiId) {
+        alert('Please enter your UPI ID.');
+        return false;
+    }
+
     const isValid = validateUpiDetails(upiId);
     if (!isValid) {
         alert('Please enter a valid UPI ID.');
@@ -208,6 +212,11 @@ function collectAndValidateUpiDetails() {
 
 function collectAndValidateGpayDetails() {
     const gpayId = document.getElementById('gpay-id').value.trim();
+
+    if (!gpayId) {
+        alert('Please enter your Google Pay ID.');
+        return false;
+    }
 
     const isValid = validateGpayDetails(gpayId);
     if (!isValid) {

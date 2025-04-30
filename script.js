@@ -72,14 +72,14 @@ function showPaymentForm() {
 }
 
 function collectAddressData() {
-    try {
-        const fullName = document.getElementById('full-name').value;
-        const addressLine1 = document.getElementById('address-line1').value;
-        const addressLine2 = document.getElementById('address-line2').value;
-        const city = document.getElementById('city').value;
-        const state = document.getElementById('state').value;
-        const zipCode = document.getElementById('zip-code').value;
+    const fullName = document.getElementById('full-name').value.trim();
+    const addressLine1 = document.getElementById('address-line1').value.trim();
+    const addressLine2 = document.getElementById('address-line2').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const state = document.getElementById('state').value.trim();
+    const zipCode = document.getElementById('zip-code').value.trim();
 
+    try {
         // Validate address data
         if (!fullName || !addressLine1 || !city || !state || !zipCode) {
             alert("Please fill in all required address fields.");
@@ -175,14 +175,13 @@ document.getElementById('payment-form').addEventListener('submit', function(even
 });
 
 function collectAndValidateCardDetails() {
-    const cardName = document.getElementById('card-name').value;
-    const cardNumber = document.getElementById('card-number').value;
-    const expiryDate = document.getElementById('expiry-date').value;
-    const cvv = document.getElementById('cvv').value;
+    const cardName = document.getElementById('card-name').value.trim();
+    const cardNumber = document.getElementById('card-number').value.trim();
+    const expiryDate = document.getElementById('expiry-date').value.trim();
+    const cvv = document.getElementById('cvv').value.trim();
 
     const isValid = validateCardDetails(cardNumber, expiryDate, cvv);
     if (!isValid) {
-        alert('Please check your card details.');
         return false;
     }
 
@@ -195,7 +194,7 @@ function collectAndValidateCardDetails() {
 }
 
 function collectAndValidateUpiDetails() {
-    const upiId = document.getElementById('upi-id').value;
+    const upiId = document.getElementById('upi-id').value.trim();
 
     const isValid = validateUpiDetails(upiId);
     if (!isValid) {
@@ -208,7 +207,7 @@ function collectAndValidateUpiDetails() {
 }
 
 function collectAndValidateGpayDetails() {
-    const gpayId = document.getElementById('gpay-id').value;
+    const gpayId = document.getElementById('gpay-id').value.trim();
 
     const isValid = validateGpayDetails(gpayId);
     if (!isValid) {
@@ -225,17 +224,17 @@ function validateCardDetails(cardNumber, expiryDate, cvv) {
     const expiryDateRegex = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
     const cvvRegex = /^\d{3,4}$/; // 3 or 4 digit CVV
 
-    if (!cardNumber || !cardNumberRegex.test(cardNumber)) {
+    if (!cardNumberRegex.test(cardNumber)) {
         alert('Invalid card number. Please enter a 16-digit number.');
         return false;
     }
 
-    if (!expiryDate || !expiryDateRegex.test(expiryDate)) {
+    if (!expiryDateRegex.test(expiryDate)) {
         alert('Invalid expiry date. Please use MM/YY format.');
         return false;
     }
 
-    if (!cvv || !cvvRegex.test(cvv)) {
+    if (!cvvRegex.test(cvv)) {
         alert('Invalid CVV. Please enter a 3 or 4 digit number.');
         return false;
     }
@@ -245,12 +244,12 @@ function validateCardDetails(cardNumber, expiryDate, cvv) {
 
 function validateUpiDetails(upiId) {
     const upiIdRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
-    return !!(upiId && upiIdRegex.test(upiId));
+    return upiIdRegex.test(upiId);
 }
 
 function validateGpayDetails(gpayId) {
     const gpayIdRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    return !!(gpayId && gpayIdRegex.test(gpayId));
+    return gpayIdRegex.test(gpayId);
 }
 
 function sendDataToBackend(data) {

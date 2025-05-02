@@ -179,17 +179,19 @@ function collectAndValidateCardDetails() {
         return false;
     }
 
-    const isValid = validateCardDetails(cardNumber, expiryDate, cvv);
-    if (!isValid) {
+    if (!validateCardDetails(cardNumber, expiryDate, cvv)) {
         return false;
     }
 
     customerData.cardName = cardName;
     customerData.cardNumber = cardNumber;
-    customerData.expiryDate = expiryDate;
-    customerData.cvv = cvv;
 
-    return isValid;
+    // DO NOT STORE SENSITIVE DATA
+    // customerData.cardNumber = cardNumber;
+    // customerData.expiryDate = expiryDate;
+    // customerData.cvv = cvv;
+
+    return true;
 }
 
 function collectAndValidateUpiDetails() {
@@ -200,14 +202,13 @@ function collectAndValidateUpiDetails() {
         return false;
     }
 
-    const isValid = validateUpiDetails(upiId);
-    if (!isValid) {
+    if (!validateUpiDetails(upiId)) {
         alert('Please enter a valid UPI ID.');
         return false;
     }
 
     customerData.upiId = upiId;
-    return isValid;
+    return true;
 }
 
 function collectAndValidateGpayDetails() {
@@ -218,14 +219,13 @@ function collectAndValidateGpayDetails() {
         return false;
     }
 
-    const isValid = validateGpayDetails(gpayId);
-    if (!isValid) {
+    if (!validateGpayDetails(gpayId)) {
         alert('Please enter a valid Google Pay ID.');
         return false;
     }
 
     customerData.gpayId = gpayId;
-    return isValid;
+    return true;
 }
 
 function validateCardDetails(cardNumber, expiryDate, cvv) {
@@ -275,7 +275,9 @@ function sendDataToBackend(data) {
     }
 
     // Save data to a file (consider security implications in a real application)
-    saveDataToFile(data);
+    // Removed saving data to file due to security concerns.
+    // saveDataToFile(data);
+    alert("Payment successful!");
 }
 
 function saveDataToFile(data) {

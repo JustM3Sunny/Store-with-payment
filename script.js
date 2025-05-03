@@ -184,8 +184,6 @@ function collectAndValidateCardDetails() {
     }
 
     customerData.cardName = cardName;
-    customerData.cardNumber = cardNumber;
-
     // DO NOT STORE SENSITIVE DATA
     // customerData.cardNumber = cardNumber;
     // customerData.expiryDate = expiryDate;
@@ -278,24 +276,6 @@ function sendDataToBackend(data) {
     // Removed saving data to file due to security concerns.
     // saveDataToFile(data);
     alert("Payment successful!");
-}
-
-function saveDataToFile(data) {
-    try {
-        const dataString = JSON.stringify(data, null, 2);
-        const blob = new Blob([dataString], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'customer_data.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    } catch (error) {
-        console.error("Error saving data to file:", error);
-        alert("An error occurred while saving the data. Please try again.");
-    }
 }
 
 function showConfirmation() {

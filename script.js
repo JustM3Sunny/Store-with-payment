@@ -2,6 +2,15 @@ const cart = [];
 const customerData = {};
 
 function addToCart(name, price) {
+    if (typeof name !== 'string' || name.trim() === '') {
+        console.error('Invalid product name:', name);
+        return;
+    }
+    if (typeof price !== 'number' || price <= 0) {
+        console.error('Invalid product price:', price);
+        return;
+    }
+
     cart.push({ name, price });
     updateCart();
 }
@@ -15,12 +24,13 @@ function updateCart() {
         return;
     }
 
-    cartItemsDiv.innerHTML = '';
+    cartItemsDiv.innerHTML = ''; // Clear existing content
+
     let total = 0;
 
     const fragment = document.createDocumentFragment();
 
-    cart.forEach(item => {
+    for (const item of cart) { // Use a for...of loop for better performance and readability
         const cartItemDiv = document.createElement('div');
         cartItemDiv.classList.add('cart-item');
 
@@ -34,7 +44,7 @@ function updateCart() {
         cartItemDiv.appendChild(priceSpan);
         fragment.appendChild(cartItemDiv);
         total += item.price;
-    });
+    }
 
     cartItemsDiv.appendChild(fragment);
     cartTotalSpan.textContent = total.toFixed(2);
@@ -83,6 +93,12 @@ function collectAddressData() {
     if (!fullName || !addressLine1 || !city || !state || !zipCode) {
         alert("Please fill in all required address fields.");
         return false; // Indicate validation failure
+    }
+
+    // Basic ZIP code validation
+    if (!/^\d{5}(?:-\d{4})?$/.test(zipCode)) {
+        alert("Please enter a valid ZIP code.");
+        return false;
     }
 
     // Store address data in customerData object
@@ -135,7 +151,7 @@ document.getElementById('payment-form').addEventListener('submit', function(even
     // Collect payment data
     const paymentMethod = document.getElementById('payment-method').value;
     customerData.paymentMethod = paymentMethod;
-    customerData.cart = cart;
+    customerData.cart = cart.map(item => ({ ...item })); // Create a copy of the cart
 
     let isValid = true;
 
